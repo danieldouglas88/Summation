@@ -1,12 +1,15 @@
 package com.daniel.summation;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class MainActivity extends Activity implements View.OnClickListener {
 
@@ -16,7 +19,6 @@ public class MainActivity extends Activity implements View.OnClickListener {
     private Button button;
     private TextView textViewSum;
 
-    private String subtotalString;
 
     //define the shared pref object
     private SharedPreferences savedValues;
@@ -24,6 +26,16 @@ public class MainActivity extends Activity implements View.OnClickListener {
     //define variables to be saved
     private int num1 = 0;
     private int num2 = 0;
+
+    public static final String EXTRA_MESSAGE = "com.example.myfirstapp.MESSAGE";
+
+    public void sendMessage(View view) {
+        Intent intent = new Intent(this, DisplayMessageActivity.class);
+        EditText editText = (EditText) findViewById(R.id.editTextNum1);
+        String message = editText.getText().toString();
+        intent.putExtra(EXTRA_MESSAGE, "LOL");
+        startActivity(intent);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,25 +53,8 @@ public class MainActivity extends Activity implements View.OnClickListener {
 
         //get SharedPreferences object
         savedValues = getSharedPreferences("SavedValues", MODE_PRIVATE);
-    }
 
-    @Override
-    public void onPause() {
-        SharedPreferences.Editor editor = savedValues.edit();
-        editor.putString("subtotalString", subtotalString);
-        editor.commit();
-
-        super.onPause();
-    }
-
-    @Override
-    public void onResume() {
-    super.onResume();;
-    //restore valye of the subtotal to the saved value
-        subtotalString = savedValues.getString("subtotalString", "");
-        textViewSum.setText(subtotalString);
-        calculateAndDisplay();
-    }
+}
 
     public void calculateAndDisplay(){
         num1 = Integer.parseInt(editTextNum1.getText().toString());
@@ -72,5 +67,19 @@ public class MainActivity extends Activity implements View.OnClickListener {
     @Override
     public void onClick(View view) {
         calculateAndDisplay();
+    }
+
+    public void displaySettings(View view) {
+        //start settings activity
+        startActivity(new Intent(this, SettingsActivity.class));
+    }
+
+    public void readSettings(View view){
+        //read value that is stored in a key value pair
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        String setting1 = prefs.getString("example_text", "Joe Smith");
+
+        Toast.makeText(this, setting1, Toast.LENGTH_LONG).show();
+
     }
 }
